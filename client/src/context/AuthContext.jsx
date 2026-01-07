@@ -2,6 +2,7 @@ import { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 const AuthContext = createContext();
+const api = import.meta.env.VITE_SERVER_URL;
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
@@ -22,7 +23,7 @@ export const AuthProvider = ({ children }) => {
 
     const checkUser = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/auth/user');
+            const res = await axios.get(`${api}/api/auth/user`);
             setUser(res.data);
         } catch (err) {
             console.error(err);
@@ -34,14 +35,14 @@ export const AuthProvider = ({ children }) => {
     };
 
     const login = async (email, password) => {
-        const res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+        const res = await axios.post(`${api}/api/auth/login`, { email, password });
         localStorage.setItem('token', res.data.token);
         axios.defaults.headers.common['x-auth-token'] = res.data.token;
         await checkUser();
     };
 
     const register = async (username, email, password) => {
-        const res = await axios.post('http://localhost:5000/api/auth/register', { username, email, password });
+        const res = await axios.post(`${api}/api/auth/register`, { username, email, password });
         localStorage.setItem('token', res.data.token);
         axios.defaults.headers.common['x-auth-token'] = res.data.token;
         await checkUser();

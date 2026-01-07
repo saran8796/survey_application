@@ -1,8 +1,9 @@
-const express = require('express');
+import express from 'express';
+import auth from '../middleware/auth.js';
+import Survey from '../models/Survey.js';
+import Response from '../models/Response.js';
+
 const router = express.Router();
-const auth = require('../middleware/auth');
-const Survey = require('../models/Survey');
-const Response = require('../models/Response');
 
 // @route   POST api/surveys
 // @desc    Create a survey
@@ -150,4 +151,4 @@ router.get('/:id/responses', auth, async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

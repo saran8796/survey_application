@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+const api = import.meta.env.VITE_SERVER_URL;
 
 const TakeSurvey = () => {
     const { id } = useParams();
@@ -12,7 +13,7 @@ const TakeSurvey = () => {
     useEffect(() => {
         const fetchSurvey = async () => {
             try {
-                const res = await axios.get(`http://localhost:5000/api/surveys/${id}`);
+                const res = await axios.get(`${api}/api/surveys/${id}`);
                 setSurvey(res.data);
                 // Initialize answers state
                 const initialAnswers = {};
@@ -41,7 +42,7 @@ const TakeSurvey = () => {
         }));
 
         try {
-            await axios.post(`http://localhost:5000/api/surveys/${id}/responses`, { answers: formattedAnswers });
+            await axios.post(`${api}/api/surveys/${id}/responses`, { answers: formattedAnswers });
             setSubmitted(true);
         } catch (err) {
             console.error(err);

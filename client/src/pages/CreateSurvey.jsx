@@ -2,13 +2,14 @@ import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AuthContext from '../context/AuthContext';
+const api = import.meta.env.VITE_SERVER_URL;
 
 const CreateSurvey = () => {
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
     const [title, setTitle] = useState('');
     const [questions, setQuestions] = useState([{ text: '', type: 'short-answer', options: [] }]);
-
+    
     const addQuestion = () => {
         setQuestions([...questions, { text: '', type: 'short-answer', options: [] }]);
     };
@@ -39,7 +40,7 @@ const CreateSurvey = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:5000/api/surveys', { title, questions });
+            await axios.post(`${api}/api/surveys`, { title, questions });
             navigate('/dashboard');
         } catch (err) {
             console.error(err);

@@ -12,6 +12,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+const api = import.meta.env.VITE_SERVER_URL;
 
 ChartJS.register(
   CategoryScale,
@@ -32,11 +33,11 @@ const SurveyResults = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const surveyRes = await axios.get(`http://localhost:5000/api/surveys/${id}`);
+                const surveyRes = await axios.get(`${api}/api/surveys/${id}`);
                 // Access control check (optional, backend handles it too but nice for UI)
                 // if (user && surveyRes.data.user !== user.id) ... 
                 
-                const responseRes = await axios.get(`http://localhost:5000/api/surveys/${id}/responses`);
+                const responseRes = await axios.get(`${api}/api/surveys/${id}/responses`);
                 
                 setSurvey(surveyRes.data);
                 setResponses(responseRes.data);

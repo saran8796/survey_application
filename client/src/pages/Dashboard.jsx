@@ -2,6 +2,7 @@ import { useEffect, useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AuthContext from '../context/AuthContext';
+const api = import.meta.env.VITE_SERVER_URL;
 
 const Dashboard = () => {
     const { user, loading } = useContext(AuthContext);
@@ -18,7 +19,7 @@ const Dashboard = () => {
 
     const fetchSurveys = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/surveys/');
+            const res = await axios.get(`${api}/api/surveys/`);
             setSurveys(res.data);
         } catch (err) {
             console.error(err);
@@ -28,7 +29,7 @@ const Dashboard = () => {
     const deleteSurvey = async (id) => {
         if (window.confirm('Are you sure you want to delete this survey?')) {
             try {
-                await axios.delete(`http://localhost:5000/api/surveys/${id}`);
+                await axios.delete(`${api}/api/surveys/${id}`);
                 setSurveys(surveys.filter(s => s._id !== id));
             } catch (err) {
                 console.error(err);

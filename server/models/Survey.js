@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const OptionSchema = new mongoose.Schema({
     text: { type: String, required: true }
@@ -31,4 +31,4 @@ const SurveySchema = new mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model('Survey', SurveySchema);
+export default mongoose.model('Survey', SurveySchema);
