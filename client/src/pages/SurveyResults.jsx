@@ -51,7 +51,7 @@ const SurveyResults = () => {
     const [responses, setResponses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [activeTab, setActiveTab] = useState('overview');
+
     const [copied, setCopied] = useState(false);
 
     useEffect(() => {
@@ -365,30 +365,12 @@ const SurveyResults = () => {
 
                     </div>
 
-                    {/* Tabs */}
+                    {/* Tabs - Overview Tag Only */}
                     <div className="flex border-b border-[#e5e7eb] mb-6">
-                        <button
-                            onClick={() => setActiveTab('overview')}
-                            className={`px-6 py-3 font-medium text-sm border-b-2 transition-colors ${
-                                activeTab === 'overview'
-                                    ? 'border-[#4361ee] text-[#4361ee]'
-                                    : 'border-transparent text-[#6b7280] hover:text-[#1f2937]'
-                            }`}
-                        >
+                        <div className="px-6 py-3 font-medium text-sm border-b-2 border-[#4361ee] text-[#4361ee]">
                             <BarChart3 size={16} className="inline mr-2" />
                             Overview
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('responses')}
-                            className={`px-6 py-3 font-medium text-sm border-b-2 transition-colors ${
-                                activeTab === 'responses'
-                                    ? 'border-[#4361ee] text-[#4361ee]'
-                                    : 'border-transparent text-[#6b7280] hover:text-[#1f2937]'
-                            }`}
-                        >
-                            <Users size={16} className="inline mr-2" />
-                            Individual Responses
-                        </button>
+                        </div>
                     </div>
                 </div>
 
