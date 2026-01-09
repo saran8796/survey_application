@@ -317,6 +317,15 @@ const TakeSurvey = () => {
                                                         <span>Poor</span>
                                                         <span>Excellent</span>
                                                     </div>
+                                                    {/* Hidden input for HTML5 validation */}
+                                                    <input 
+                                                        type="text" 
+                                                        className="sr-only" 
+                                                        value={answers[q._id] || ''} 
+                                                        required={q.required} 
+                                                        onChange={() => {}}
+                                                        tabIndex={-1}
+                                                    />
                                                 </div>
                                             ) : null}
                                         </div>

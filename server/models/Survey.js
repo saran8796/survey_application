@@ -8,10 +8,11 @@ const QuestionSchema = new mongoose.Schema({
     text: { type: String, required: true },
     type: {
         type: String,
-        enum: ['short-answer', 'multiple-choice'],
+        enum: ['short-answer', 'multiple-choice', 'rating'],
         required: true
     },
-    options: [OptionSchema] // Only for multiple-choice
+    options: [OptionSchema], // Only for multiple-choice
+    required: { type: Boolean, default: false }
 });
 
 const SurveySchema = new mongoose.Schema({
@@ -23,6 +24,9 @@ const SurveySchema = new mongoose.Schema({
     title: {
         type: String,
         required: true
+    },
+    description: {
+        type: String
     },
     questions: [QuestionSchema],
     createdAt: {

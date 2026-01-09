@@ -122,7 +122,7 @@ const Dashboard = () => {
                         <div>
                             <h1 className="text-3xl font-bold text-[#1f2937] mb-2">Dashboard</h1>
                             <p className="text-[#6b7280]">
-                                Welcome back, <span className="font-semibold text-[#4361ee]">{user?.username}</span>
+                                Welcome back, <span className="font-semibold text-[#4361ee]">{user?.fullName || user?.username}</span>
                             </p>
                         </div>
                         <Link 

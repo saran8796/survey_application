@@ -13,7 +13,7 @@ import {
 
 const Login = () => {
     const [formData, setFormData] = useState({
-        email: '',
+        emailOrUsername: '',
         password: ''
     });
     const [showPassword, setShowPassword] = useState(false);
@@ -23,7 +23,7 @@ const Login = () => {
     const { login } = useContext(AuthContext);
     const navigate = useNavigate();
 
-    const { email, password } = formData;
+    const { emailOrUsername, password } = formData;
 
     const onChange = e => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -36,11 +36,11 @@ const Login = () => {
         setError('');
 
         try {
-            await login(email, password);
+            await login(emailOrUsername, password);
             navigate('/dashboard');
         } catch (err) {
             console.error('Login failed', err);
-            setError(err.message || 'Invalid email or password. Please try again.');
+            setError(err.response?.data?.msg || 'Invalid email or password. Please try again.');
         } finally {
             setIsLoading(false);
         }
@@ -75,22 +75,22 @@ const Login = () => {
 
                 {/* Login Form */}
                 <form onSubmit={onSubmit} className="space-y-6">
-                    {/* Email Input */}
+                {/* Email or Username Input */}
                     <div>
                         <label className="block text-sm font-medium text-[#1f2937] mb-2">
-                            Email Address
+                            Email or Username
                         </label>
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <Mail className="h-5 w-5 text-[#6b7280]" />
                             </div>
                             <input
-                                type="email"
-                                name="email"
-                                value={email}
+                                type="text"
+                                name="emailOrUsername"
+                                value={emailOrUsername}
                                 onChange={onChange}
                                 className="w-full pl-10 pr-4 py-3 border border-[#e5e7eb] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4361ee] focus:border-transparent transition-all bg-white"
-                                placeholder="you@example.com"
+                                placeholder="Email address or username"
                                 required
                                 disabled={isLoading}
                             />

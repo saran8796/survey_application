@@ -63,7 +63,7 @@ const Navbar = () => {
                       <UserCircle className="text-[#4361ee]" size={20} />
                     </div>
                     <span className="text-gray-900 font-medium">
-                      {user.username}
+                      {user.fullName || user.username}
                     </span>
                   </div>
                   
@@ -119,7 +119,7 @@ const Navbar = () => {
                     <UserCircle className="text-[#4361ee]" size={24} />
                   </div>
                   <div>
-                    <p className="text-gray-900 font-semibold">{user.username}</p>
+                    <p className="text-gray-900 font-semibold">{user.fullName || user.username}</p>
                     <p className="text-gray-600 text-sm">Welcome back!</p>
                   </div>
                 </div>

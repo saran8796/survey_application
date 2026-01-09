@@ -105,13 +105,24 @@ router.delete('/:id', auth, async (req, res) => {
 router.post('/:id/responses', async (req, res) => {
     try {
         const { answers } = req.body;
-        // Optionally handle user if logged in
-        // const userId = req.user ? req.user.id : null; 
         
         // Basic validation: check if survey exists
         const survey = await Survey.findById(req.params.id);
         if (!survey) {
             return res.status(404).json({ msg: 'Survey not found' });
+        }
+
+        // Validate required questions
+        const requiredQuestions = survey.questions.filter(q => q.required);
+        const missingAnswers = requiredQuestions.filter(q => {
+            const answer = answers.find(a => a.questionId === q._id.toString());
+            return !answer || !answer.answerText || answer.answerText.trim() === '';
+        });
+
+        if (missingAnswers.length > 0) {
+            return res.status(400).json({ 
+                msg: `Missing answers for required questions: ${missingAnswers.map(q => q.text).join(', ')}` 
+            });
         }
 
         const newResponse = new Response({

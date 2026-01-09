@@ -131,7 +131,36 @@ const SurveyResults = () => {
                     }
                 ]
             };
+        } else if (question.type === 'rating') {
+            const counts = { '1': 0, '2': 0, '3': 0, '4': 0, '5': 0 };
+            
+            responses.forEach(r => {
+                const answer = r.answers.find(a => a.questionId === question._id);
+                if (answer && counts[answer.answerText] !== undefined) {
+                    counts[answer.answerText]++;
+                }
+            });
+
+            const labels = Object.keys(counts);
+            const data = Object.values(counts);
+            
+            return {
+                labels,
+                datasets: [
+                    {
+                        label: 'Ratings',
+                        data,
+                        backgroundColor: labels.map((_, index) => 
+                            `rgba(16, 185, 129, ${0.4 + (index * 0.15)})`
+                        ),
+                        borderColor: '#10b981',
+                        borderWidth: 1,
+                        borderRadius: 8,
+                    }
+                ]
+            };
         }
+
         return null;
     };
 
@@ -300,7 +329,7 @@ const SurveyResults = () => {
                                             </div>
                                             <h3 className="text-lg font-semibold text-[#1f2937]">{q.text}</h3>
                                             <span className="px-2 py-1 bg-[#f9fafb] text-[#6b7280] text-xs rounded-full">
-                                                {q.type === 'multiple-choice' ? 'Multiple Choice' : 'Short Answer'}
+                                                {q.type === 'multiple-choice' ? 'Multiple Choice' : q.type === 'rating' ? 'Rating' : 'Short Answer'}
                                             </span>
                                         </div>
                                         <p className="text-[#6b7280] text-sm">
@@ -311,7 +340,7 @@ const SurveyResults = () => {
                             </div>
 
                             <div className="p-6">
-                                {q.type === 'multiple-choice' ? (
+                                {q.type === 'multiple-choice' || q.type === 'rating' ? (
                                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                         {/* Bar Chart */}
                                         <div className="h-72">

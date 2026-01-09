@@ -34,15 +34,15 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const login = async (email, password) => {
-        const res = await axios.post(`${api}/api/auth/login`, { email, password });
+    const login = async (emailOrUsername, password) => {
+        const res = await axios.post(`${api}/api/auth/login`, { emailOrUsername, password });
         localStorage.setItem('token', res.data.token);
         axios.defaults.headers.common['x-auth-token'] = res.data.token;
         await checkUser();
     };
 
-    const register = async (username, email, password) => {
-        const res = await axios.post(`${api}/api/auth/register`, { username, email, password });
+    const register = async (username, email, password, fullName) => {
+        const res = await axios.post(`${api}/api/auth/register`, { username, email, password, fullName });
         localStorage.setItem('token', res.data.token);
         axios.defaults.headers.common['x-auth-token'] = res.data.token;
         await checkUser();

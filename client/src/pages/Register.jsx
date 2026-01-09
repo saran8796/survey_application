@@ -16,6 +16,7 @@ import {
 const Register = () => {
     const [formData, setFormData] = useState({
         username: '',
+        fullName: '',
         email: '',
         password: ''
     });
@@ -27,7 +28,7 @@ const Register = () => {
     const { register } = useContext(AuthContext);
     const navigate = useNavigate();
 
-    const { username, email, password } = formData;
+    const { username, fullName, email, password } = formData;
 
     const onChange = e => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -41,15 +42,23 @@ const Register = () => {
         setError('');
         setSuccess('');
 
+        // Password Validation
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+        if (!passwordRegex.test(password)) {
+             setError('Password must be at least 8 characters and include letters, numbers, and symbols.');
+             setIsLoading(false);
+             return;
+        }
+
         try {
-            await register(username, email, password);
+            await register(username, email, password, fullName);
             setSuccess('Account created successfully! Redirecting...');
             setTimeout(() => {
                 navigate('/dashboard');
             }, 1500);
         } catch (err) {
             console.error('Registration failed', err);
-            setError(err.message || 'Registration failed. Please try again.');
+            setError(err.response?.data?.msg || 'Registration failed. Please try again.');
         } finally {
             setIsLoading(false);
         }
@@ -92,6 +101,30 @@ const Register = () => {
 
                 {/* Register Form */}
                 <form onSubmit={onSubmit} className="space-y-6">
+                    
+
+                    {/* Full Name Input */}
+                    <div>
+                        <label className="block text-sm font-medium text-[#1f2937] mb-2">
+                            Full Name
+                        </label>
+                        <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <User className="h-5 w-5 text-[#6b7280]" />
+                            </div>
+                            <input
+                                type="text"
+                                name="fullName"
+                                value={fullName}
+                                onChange={onChange}
+                                className="w-full pl-10 pr-4 py-3 border border-[#e5e7eb] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4361ee] focus:border-transparent transition-all bg-white"
+                                placeholder="Enter your full name"
+                                required
+                                disabled={isLoading}
+                            />
+                        </div>
+                    </div>
+
                     {/* Username Input */}
                     <div>
                         <label className="block text-sm font-medium text-[#1f2937] mb-2">

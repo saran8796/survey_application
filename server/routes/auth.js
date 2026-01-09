@@ -10,18 +10,24 @@ const router = express.Router();
 // @desc    Register user
 // @access  Public
 router.post('/register', async (req, res) => {
-    const { username, email, password } = req.body;
+    const { username, email, password, fullName } = req.body;
 
     try {
-        let user = await User.findOne({ email });
-        if (user) {
+        let userByEmail = await User.findOne({ email });
+        if (userByEmail) {
             return res.status(400).json({ msg: 'User already exists' });
         }
 
-        user = new User({
+        let userByUsername = await User.findOne({ username });
+        if (userByUsername) {
+            return res.status(400).json({ msg: 'Username already taken' });
+        }
+
+        let user = new User({
             username,
             email,
-            password
+            password,
+            fullName
         });
 
         await user.save();
@@ -43,6 +49,9 @@ router.post('/register', async (req, res) => {
         );
     } catch (err) {
         console.error(err.message);
+        if (err.code === 11000) {
+            return res.status(400).json({ msg: 'User already exists' });
+        }
         res.status(500).send('Server error');
     }
 });
@@ -51,17 +60,21 @@ router.post('/register', async (req, res) => {
 // @desc    Authenticate user & get token
 // @access  Public
 router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
+    const { emailOrUsername, password } = req.body;
 
     try {
-        let user = await User.findOne({ email });
+        // Check if input is email or username
+        let user = await User.findOne({
+            $or: [{ email: emailOrUsername }, { username: emailOrUsername }]
+        });
+        
         if (!user) {
-            return res.status(400).json({ msg: 'Invalid Credentials' });
+            return res.status(400).json({ msg: 'User not found' });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(400).json({ msg: 'Invalid Credentials' });
+            return res.status(400).json({ msg: 'Incorrect password' });
         }
 
         const payload = {
