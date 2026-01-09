@@ -13,7 +13,7 @@ import {
   Loader2,
   ChevronRight,
   ClipboardCheck,
-  TrendingUp,
+
   AlertCircle,
   Link as LinkIcon,
   Copy,
@@ -26,11 +26,7 @@ const api = import.meta.env.VITE_SERVER_URL;
 const Dashboard = () => {
     const { user, loading } = useContext(AuthContext);
     const [surveys, setSurveys] = useState([]);
-    const [stats, setStats] = useState({
-        totalSurveys: 0,
-        totalResponses: 0,
-        activeSurveys: 0
-    });
+
     const [isDeleting, setIsDeleting] = useState(null);
     const [copiedSurveyId, setCopiedSurveyId] = useState(null);
     const navigate = useNavigate();
@@ -48,16 +44,7 @@ const Dashboard = () => {
             const res = await axios.get(`${api}/api/surveys/`);
             setSurveys(res.data);
             
-            // Calculate stats
-            const totalResponses = res.data.reduce((acc, survey) => 
-                acc + (survey.responses?.length || 0), 0);
-            const activeSurveys = res.data.filter(s => s.status === 'active').length;
-            
-            setStats({
-                totalSurveys: res.data.length,
-                totalResponses,
-                activeSurveys
-            });
+
         } catch (err) {
             console.error(err);
         }
@@ -135,44 +122,7 @@ const Dashboard = () => {
                         </Link>
                     </div>
 
-                    {/* Stats Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div className="bg-white p-6 rounded-2xl border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-[#6b7280] text-sm font-medium mb-1">Total Surveys</p>
-                                    <p className="text-3xl font-bold text-[#1f2937]">{stats.totalSurveys}</p>
-                                </div>
-                                <div className="w-12 h-12 rounded-xl bg-[#edf2ff] flex items-center justify-center">
-                                    <ClipboardCheck className="text-[#4361ee]" size={24} />
-                                </div>
-                            </div>
-                        </div>
 
-                        <div className="bg-white p-6 rounded-2xl border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-[#6b7280] text-sm font-medium mb-1">Total Responses</p>
-                                    <p className="text-3xl font-bold text-[#1f2937]">{stats.totalResponses}</p>
-                                </div>
-                                <div className="w-12 h-12 rounded-xl bg-[#edf2ff] flex items-center justify-center">
-                                    <Users className="text-[#4361ee]" size={24} />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="bg-white p-6 rounded-2xl border border-[#e5e7eb] shadow-sm hover:shadow-md transition-shadow">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-[#6b7280] text-sm font-medium mb-1">Active Surveys</p>
-                                    <p className="text-3xl font-bold text-[#1f2937]">{stats.activeSurveys}</p>
-                                </div>
-                                <div className="w-12 h-12 rounded-xl bg-[#edf2ff] flex items-center justify-center">
-                                    <TrendingUp className="text-[#4361ee]" size={24} />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 {/* My Surveys Section */}
