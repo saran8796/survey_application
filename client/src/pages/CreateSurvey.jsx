@@ -101,13 +101,13 @@ const CreateSurvey = () => {
 
             await axios.post(`${api}/api/surveys`, { 
                 title, 
-                description: description.trim() || undefined,
+                description: description.trim() || null,
                 questions: cleanQuestions 
             });
             navigate('/dashboard');
         } catch (err) {
             console.error(err);
-            setError(err.response?.data?.message || 'Failed to create survey. Please try again.');
+            setError(err.response?.data?.msg || err.response?.data?.message || 'Failed to create survey. Please try again.');
         } finally {
             setIsSubmitting(false);
         }

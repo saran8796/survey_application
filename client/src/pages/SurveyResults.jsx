@@ -56,20 +56,54 @@ const SurveyResults = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            if (!user) {
-                navigate('/login');
-                return;
-            }
-
+            // Remove immediate redirect. We'll check access after fetching or if we know we are guest.
+            // However, typical flow is: try to fetch, if 401/403 then redirect.
+            // But we can check user state first.
+            
+            // If we want to support public access without login, we need to try fetching first OR handle the "no user" case gracefully.
+            // Let's modify the fetch logic to try the public endpoint if no user, or normal endpoint if user.
+            
             try {
-                const surveyRes = await axios.get(`${api}/api/surveys/${id}`);
-                const responseRes = await axios.get(`${api}/api/surveys/${id}/responses`);
+                let surveyData;
+                let responseData;
+
+                if (user) {
+                    // Authenticated fetch
+                     const surveyRes = await axios.get(`${api}/api/surveys/${id}`);
+                     const responseRes = await axios.get(`${api}/api/surveys/${id}/responses`);
+                     surveyData = surveyRes.data;
+                     responseData = responseRes.data;
+                } else {
+                    // Public fetch attempt (guests)
+                    // We need a specific endpoint or just try the general one if we opened it up.
+                    // The 'optional auth' approach in backend would be ideal.
+                    // Since we didn't fully implement "optional auth" middleware, we use distinct or try/catch.
+                    // Let's assume the user MIGHT be logged out but the survey IS public.
+                    // We can try to fetch survey details (public route?) -> Survey details route is PUBLIC.
+                    
+                    const surveyRes = await axios.get(`${api}/api/surveys/${id}`);
+                    surveyData = surveyRes.data;
+
+                    if (surveyData.isPublicResults) {
+                         // Use the public responses endpoint we created
+                         const responseRes = await axios.get(`${api}/api/surveys/${id}/responses/public`);
+                         responseData = responseRes.data;
+                    } else {
+                        // Not public, and not logged in
+                        navigate('/login');
+                        return;
+                    }
+                }
                 
-                setSurvey(surveyRes.data);
-                setResponses(responseRes.data);
+                setSurvey(surveyData);
+                setResponses(responseData);
             } catch (err) {
-                console.error(err);
-                setError('Failed to load survey results. You may not have permission to view this data.');
+                 console.error(err);
+                 if (!user) {
+                     navigate('/login'); // Redirect if fetch fails and not logged in
+                 } else {
+                    setError('Failed to load survey results. You may not have permission to view this data.');
+                 }
             } finally {
                 setLoading(false);
             }
@@ -212,6 +246,48 @@ const SurveyResults = () => {
         });
     };
 
+    const handleExportCSV = () => {
+        if (!survey || !responses.length) return;
+
+        // Create CSV Headers
+        const headers = ['Response Date', ...survey.questions.map(q => `"${q.text}"`)];
+        
+        // Create CSV Rows
+        const rows = responses.map(response => {
+            const date = new Date(response.createdAt).toLocaleString();
+            const answers = survey.questions.map(q => {
+                const answer = response.answers.find(a => a.questionId === q._id);
+                // Escape quotes in answer text
+                return answer ? `"${answer.answerText.replace(/"/g, '""')}"` : '""';
+            });
+            return [date, ...answers].join(',');
+        });
+
+        // Combine Headers and Rows
+        const csvContent = [headers.join(','), ...rows].join('\n');
+        
+        // Create Blob and Download
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', `${survey.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_results.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    const togglePublicAccess = async () => {
+        try {
+            const res = await axios.put(`${api}/api/surveys/${id}/toggle-public`);
+            setSurvey({ ...survey, isPublicResults: res.data.isPublicResults });
+        } catch (err) {
+            console.error('Failed to toggle public access:', err);
+            // Optionally set an error state here
+        }
+    };
+
     return (
         <div className="min-h-screen bg-linear-to-b from-white to-[#f9fafb] py-8">
             <div className="container mx-auto px-4 max-w-6xl">
@@ -229,7 +305,7 @@ const SurveyResults = () => {
                             </div>
                             <h1 className="text-3xl font-bold text-[#1f2937] mb-2">{survey.title}</h1>
                             <p className="text-[#6b7280]">
-                                Analyze responses and gain insights from your survey data
+                                {survey.description || "Analyze responses and gain insights from your survey data"}
                             </p>
                         </div>
                         
@@ -498,18 +574,28 @@ const SurveyResults = () => {
                             <p className="text-sm text-[#6b7280]">Download your survey data for further analysis</p>
                         </div>
                         <div className="flex flex-wrap gap-3">
-                            <button className="inline-flex items-center px-4 py-2 bg-white border border-[#e5e7eb] text-[#1f2937] rounded-xl hover:bg-[#f9fafb] transition-colors">
+                            <button 
+                                onClick={handleExportCSV}
+                                className="inline-flex items-center px-4 py-2 bg-white border border-[#e5e7eb] text-[#1f2937] rounded-xl hover:bg-[#f9fafb] transition-colors"
+                            >
                                 <Download size={16} className="mr-2" />
                                 CSV Export
                             </button>
-                            <button className="inline-flex items-center px-4 py-2 bg-white border border-[#e5e7eb] text-[#1f2937] rounded-xl hover:bg-[#f9fafb] transition-colors">
-                                <Download size={16} className="mr-2" />
-                                PDF Report
-                            </button>
-                            <button className="inline-flex items-center px-4 py-2 bg-[#4361ee] text-white rounded-xl hover:bg-[#3a56d4] transition-colors">
-                                <Share2 size={16} className="mr-2" />
-                                Share Summary
-                            </button>
+                            
+                            {/* Only show sharing options for owner */}
+                            {user && survey.user && (typeof survey.user === 'object' ? survey.user._id : survey.user) === user._id && (
+                                <button 
+                                    onClick={togglePublicAccess}
+                                    className={`inline-flex items-center px-4 py-2 border rounded-xl transition-colors ${
+                                        survey.isPublicResults 
+                                            ? 'bg-green-50 border-green-200 text-green-700 hover:bg-green-100' 
+                                            : 'bg-white border-[#e5e7eb] text-[#1f2937] hover:bg-[#f9fafb]'
+                                    }`}
+                                >
+                                    <Share2 size={16} className="mr-2" />
+                                    {survey.isPublicResults ? 'Disable Public Access' : 'Enable Public Access'}
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>

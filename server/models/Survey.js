@@ -32,6 +32,10 @@ const SurveySchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    isPublicResults: {
+        type: Boolean,
+        default: false
     }
 });
 

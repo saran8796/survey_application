@@ -175,14 +175,14 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                {/* Surveys Section */}
-                <div className="bg-white rounded-2xl border border-[#e5e7eb] shadow-sm overflow-hidden">
+                {/* My Surveys Section */}
+                <div className="bg-white rounded-2xl border border-[#e5e7eb] shadow-sm overflow-hidden mb-8">
                     <div className="px-6 py-4 border-b border-[#e5e7eb]">
                         <h2 className="text-xl font-bold text-[#1f2937]">My Surveys</h2>
-                        <p className="text-[#6b7280] text-sm mt-1">Create, manage, and analyze your surveys</p>
+                        <p className="text-[#6b7280] text-sm mt-1">Manage and analyze your surveys</p>
                     </div>
 
-                    {surveys.length === 0 ? (
+                    {surveys.filter(s => s.user._id === user?._id || s.user === user?._id).length === 0 ? (
                         <div className="p-12 text-center">
                             <div className="w-16 h-16 rounded-full bg-[#edf2ff] flex items-center justify-center mx-auto mb-4">
                                 <AlertCircle className="text-[#4361ee]" size={24} />
@@ -201,7 +201,7 @@ const Dashboard = () => {
                         </div>
                     ) : (
                         <div className="divide-y divide-[#e5e7eb]">
-                            {surveys.map(survey => (
+                            {surveys.filter(s => s.user._id === user?._id || s.user === user?._id).map(survey => (
                                 <div key={survey._id} className="p-6 hover:bg-[#f9fafb] transition-colors">
                                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                         <div className="flex-1">
@@ -237,16 +237,6 @@ const Dashboard = () => {
                                         </div>
 
                                         <div className="flex flex-wrap items-center gap-2">
-                                            {/* Take Survey Button */}
-                                            <Link 
-                                                to={`/survey/${survey._id}`}
-                                                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#10b981] text-white hover:bg-[#0da271] transition-colors font-medium"
-                                            >
-                                                <PlayCircle size={16} />
-                                                Take Survey
-                                            </Link>
-
-                                            {/* View Results Button */}
                                             <Link 
                                                 to={`/survey/${survey._id}/results`}
                                                 className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-[#4361ee] hover:bg-[#edf2ff] transition-colors font-medium"
@@ -255,7 +245,6 @@ const Dashboard = () => {
                                                 Analytics
                                             </Link>
 
-                                            {/* Share Button */}
                                             <button
                                                 onClick={() => copySurveyLink(survey._id)}
                                                 className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-[#f59e0b] hover:bg-amber-50 transition-colors font-medium"
@@ -274,7 +263,6 @@ const Dashboard = () => {
                                                 )}
                                             </button>
 
-                                            {/* Delete Button */}
                                             <button
                                                 onClick={() => deleteSurvey(survey._id)}
                                                 disabled={isDeleting === survey._id}
@@ -292,6 +280,65 @@ const Dashboard = () => {
                                                     </>
                                                 )}
                                             </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* Community Surveys Section */}
+                <div className="bg-white rounded-2xl border border-[#e5e7eb] shadow-sm overflow-hidden">
+                    <div className="px-6 py-4 border-b border-[#e5e7eb]">
+                        <h2 className="text-xl font-bold text-[#1f2937]">Community Surveys</h2>
+                        <p className="text-[#6b7280] text-sm mt-1">Explore surveys from other users</p>
+                    </div>
+
+                    {surveys.filter(s => s.user._id !== user?._id && s.user !== user?._id).length === 0 ? (
+                        <div className="p-8 text-center text-[#6b7280]">
+                            No community surveys available yet.
+                        </div>
+                    ) : (
+                        <div className="divide-y divide-[#e5e7eb]">
+                            {surveys.filter(s => s.user._id !== user?._id && s.user !== user?._id).map(survey => (
+                                <div key={survey._id} className="p-6 hover:bg-[#f9fafb] transition-colors">
+                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                        <div className="flex-1">
+                                            <div className="flex items-start gap-3">
+                                                <div className="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center shrink-0">
+                                                    <Users className="text-purple-600" size={20} />
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-semibold text-[#1f2937] text-lg mb-1">
+                                                        {survey.title}
+                                                    </h3>
+                                                    <div className="flex flex-wrap items-center gap-4 text-sm text-[#6b7280]">
+                                                        <span className="flex items-center gap-1">
+                                                            <Users size={14} />
+                                                            Created by {survey.user?.fullName || survey.user?.username || 'Unknown'}
+                                                        </span>
+                                                        <span className="flex items-center gap-1">
+                                                            <Calendar size={14} />
+                                                            {formatDate(survey.createdAt)}
+                                                        </span>
+                                                        <span className="flex items-center gap-1">
+                                                            <ClipboardCheck size={14} />
+                                                            {survey.responses?.length || 0} responses
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center">
+                                            <Link 
+                                                to={`/survey/${survey._id}`}
+                                                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#10b981] text-white hover:bg-[#0da271] transition-colors font-medium"
+                                            >
+                                                <PlayCircle size={16} />
+                                                Take Survey
+                                            </Link>
                                         </div>
                                     </div>
                                 </div>

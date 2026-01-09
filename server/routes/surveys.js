@@ -10,10 +10,11 @@ const router = express.Router();
 // @access  Private
 router.post('/', auth, async (req, res) => {
     try {
-        const { title, questions } = req.body;
+        const { title, description, questions } = req.body;
 
         const newSurvey = new Survey({
             title,
+            description,
             questions,
             user: req.user.id
         });
@@ -31,7 +32,9 @@ router.post('/', auth, async (req, res) => {
 // @access  Public
 router.get('/', async (req, res) => {
     try {
-        const surveys = await Survey.find().sort({ createdAt: -1 });
+        const surveys = await Survey.find()
+            .populate('user', 'username fullName')
+            .sort({ createdAt: -1 });
         res.json(surveys);
     } catch (err) {
         console.error(err.message);
@@ -141,7 +144,7 @@ router.post('/:id/responses', async (req, res) => {
 
 // @route   GET api/surveys/:id/responses
 // @desc    Get all responses for a survey
-// @access  Private (Owner only)
+// @access  Public (if shared) or Private (Owner only)
 router.get('/:id/responses', auth, async (req, res) => {
     try {
         const survey = await Survey.findById(req.params.id);
@@ -149,7 +152,7 @@ router.get('/:id/responses', auth, async (req, res) => {
             return res.status(404).json({ msg: 'Survey not found' });
         }
 
-        // Check user
+        // Check user (must be owner)
         if (survey.user.toString() !== req.user.id) {
             return res.status(401).json({ msg: 'User not authorized' });
         }
@@ -161,5 +164,50 @@ router.get('/:id/responses', auth, async (req, res) => {
         res.status(500).send('Server Error');
     }
 });
+
+router.get('/:id/responses/public', async (req, res) => {
+    try {
+        const survey = await Survey.findById(req.params.id);
+        if (!survey) {
+            return res.status(404).json({ msg: 'Survey not found' });
+        }
+
+        if (!survey.isPublicResults) {
+            return res.status(401).json({ msg: 'Public access not enabled' });
+        }
+
+        const responses = await Response.find({ survey: req.params.id }).sort({ createdAt: -1 });
+        // Maybe filter sensitive data? For now return all.
+        res.json(responses);
+    } catch (err) {
+         console.error(err.message);
+         res.status(500).send('Server Error');
+    }
+});
+
+// @route   PUT api/surveys/:id/toggle-public
+// @desc    Toggle public results access
+// @access  Private (Owner only)
+router.put('/:id/toggle-public', auth, async (req, res) => {
+    try {
+        const survey = await Survey.findById(req.params.id);
+        if (!survey) {
+            return res.status(404).json({ msg: 'Survey not found' });
+        }
+
+        if (survey.user.toString() !== req.user.id) {
+            return res.status(401).json({ msg: 'User not authorized' });
+        }
+
+        survey.isPublicResults = !survey.isPublicResults;
+        await survey.save();
+        res.json(survey);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+
 
 export default router;

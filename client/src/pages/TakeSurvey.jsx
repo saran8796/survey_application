@@ -79,7 +79,7 @@ const TakeSurvey = () => {
             setSubmitted(true);
         } catch (err) {
             console.error(err);
-            setError(err.response?.data?.message || 'Failed to submit. Please try again.');
+            setError(err.response?.data?.msg || err.response?.data?.message || 'Failed to submit. Please try again.');
         } finally {
             setIsSubmitting(false);
         }
@@ -320,11 +320,13 @@ const TakeSurvey = () => {
                                                     {/* Hidden input for HTML5 validation */}
                                                     <input 
                                                         type="text" 
-                                                        className="sr-only" 
+                                                        className="absolute opacity-0 w-1 h-1 pointer-events-none" 
                                                         value={answers[q._id] || ''} 
                                                         required={q.required} 
                                                         onChange={() => {}}
                                                         tabIndex={-1}
+                                                        onInvalid={(e) => e.target.setCustomValidity('Please select a rating')}
+                                                        onInput={(e) => e.target.setCustomValidity('')}
                                                     />
                                                 </div>
                                             ) : null}
