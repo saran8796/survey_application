@@ -54,7 +54,7 @@ const TakeSurvey = () => {
             <div className="container mx-auto p-4 text-center">
                 <h2 className="text-3xl font-bold text-green-600 mb-4">Thank You!</h2>
                 <p>Your response has been recorded.</p>
-                <button onClick={() => navigate('/')} className="mt-4 text-blue-500 underline">Go Home</button>
+                <button onClick={() => navigate('/dashboard')} className="mt-4 cursor-pointer text-blue-500 underline">Go to Dashboard</button>
             </div>
     );
 
