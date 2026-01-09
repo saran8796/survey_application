@@ -35,7 +35,13 @@ router.get('/', async (req, res) => {
         const surveys = await Survey.find()
             .populate('user', 'username fullName')
             .sort({ createdAt: -1 });
-        res.json(surveys);
+
+        const surveysWithCounts = await Promise.all(surveys.map(async (survey) => {
+            const responseCount = await Response.countDocuments({ survey: survey._id });
+            return { ...survey.toObject(), responseCount };
+        }));
+
+        res.json(surveysWithCounts);
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
@@ -48,7 +54,13 @@ router.get('/', async (req, res) => {
 router.get('/my', auth, async (req, res) => {
     try {
         const surveys = await Survey.find({ user: req.user.id }).sort({ createdAt: -1 });
-        res.json(surveys);
+
+        const surveysWithCounts = await Promise.all(surveys.map(async (survey) => {
+            const responseCount = await Response.countDocuments({ survey: survey._id });
+            return { ...survey.toObject(), responseCount };
+        }));
+
+        res.json(surveysWithCounts);
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');

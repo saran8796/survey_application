@@ -170,7 +170,7 @@ const Dashboard = () => {
                                                         </span>
                                                         <span className="flex items-center gap-1">
                                                             <Users size={14} />
-                                                            {survey.responses?.length || 0} responses
+                                                            {survey.responseCount || 0} responses
                                                         </span>
                                                         {survey.status && (
                                                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -274,7 +274,7 @@ const Dashboard = () => {
                                                         </span>
                                                         <span className="flex items-center gap-1">
                                                             <ClipboardCheck size={14} />
-                                                            {survey.responses?.length || 0} responses
+                                                            {survey.responseCount || 0} responses
                                                         </span>
                                                     </div>
                                                 </div>
