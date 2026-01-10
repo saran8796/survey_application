@@ -56,13 +56,6 @@ const SurveyResults = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            // Remove immediate redirect. We'll check access after fetching or if we know we are guest.
-            // However, typical flow is: try to fetch, if 401/403 then redirect.
-            // But we can check user state first.
-            
-            // If we want to support public access without login, we need to try fetching first OR handle the "no user" case gracefully.
-            // Let's modify the fetch logic to try the public endpoint if no user, or normal endpoint if user.
-            
             try {
                 let surveyData;
                 let responseData;
@@ -75,12 +68,6 @@ const SurveyResults = () => {
                      responseData = responseRes.data;
                 } else {
                     // Public fetch attempt (guests)
-                    // We need a specific endpoint or just try the general one if we opened it up.
-                    // The 'optional auth' approach in backend would be ideal.
-                    // Since we didn't fully implement "optional auth" middleware, we use distinct or try/catch.
-                    // Let's assume the user MIGHT be logged out but the survey IS public.
-                    // We can try to fetch survey details (public route?) -> Survey details route is PUBLIC.
-                    
                     const surveyRes = await axios.get(`${api}/api/surveys/${id}`);
                     surveyData = surveyRes.data;
 
@@ -220,15 +207,15 @@ const SurveyResults = () => {
     if (error || !survey) {
         return (
             <div className="min-h-screen bg-linear-to-b from-white to-[#f9fafb] flex items-center justify-center p-4">
-                <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
-                    <AlertCircle className="w-12 h-12 text-[#ef4444] mx-auto mb-4" />
-                    <h2 className="text-xl font-bold text-[#1f2937] mb-2">Unable to Load Results</h2>
-                    <p className="text-[#6b7280] mb-6">{error || 'Survey not found or access denied.'}</p>
+                <div className="max-w-md w-full bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-8 text-center">
+                    <AlertCircle className="w-10 h-10 md:w-12 md:h-12 text-[#ef4444] mx-auto mb-3 md:mb-4" />
+                    <h2 className="text-lg md:text-xl font-bold text-[#1f2937] mb-1 md:mb-2">Unable to Load Results</h2>
+                    <p className="text-[#6b7280] text-sm md:text-base mb-4 md:mb-6">{error || 'Survey not found or access denied.'}</p>
                     <Link
                         to="/dashboard"
-                        className="inline-flex items-center bg-[#4361ee] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#3a56d4] transition-colors"
+                        className="inline-flex items-center bg-[#4361ee] text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold hover:bg-[#3a56d4] transition-colors text-sm md:text-base"
                     >
-                        <ChevronLeft className="mr-2" size={18} />
+                        <ChevronLeft className="mr-1 md:mr-2" size={14} />
                         Back to Dashboard
                     </Link>
                 </div>
@@ -289,75 +276,75 @@ const SurveyResults = () => {
     };
 
     return (
-        <div className="min-h-screen bg-linear-to-b from-white to-[#f9fafb] py-8">
-            <div className="container mx-auto px-4 max-w-6xl">
+        <div className="min-h-screen bg-linear-to-b from-white to-[#f9fafb] py-4 md:py-8">
+            <div className="container mx-auto px-3 sm:px-4 max-w-6xl">
                 {/* Header */}
-                <div className="mb-8">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <div className="mb-6 md:mb-8">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4 mb-4 md:mb-6">
                         <div>
-                            <div className="flex items-center space-x-2 text-sm text-[#6b7280] mb-3">
+                            <div className="flex items-center space-x-1 md:space-x-2 text-xs md:text-sm text-[#6b7280] mb-2 md:mb-3">
                                 <Link to="/dashboard" className="hover:text-[#4361ee] flex items-center">
-                                    <ChevronLeft size={14} className="mr-1" />
+                                    <ChevronLeft size={12} className="mr-1" />
                                     Dashboard
                                 </Link>
                                 <span>/</span>
                                 <span className="text-[#4361ee] font-medium">Results</span>
                             </div>
-                            <h1 className="text-3xl font-bold text-[#1f2937] mb-2">{survey.title}</h1>
-                            <p className="text-[#6b7280]">
+                            <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-[#1f2937] mb-1 md:mb-2 truncate">{survey.title}</h1>
+                            <p className="text-xs md:text-sm text-[#6b7280] truncate">
                                 {survey.description || "Analyze responses and gain insights from your survey data"}
                             </p>
                         </div>
                         
-                        <div className="flex items-center space-x-3">
+                        <div className="flex items-center space-x-2 md:space-x-3 mt-3 md:mt-0">
                             <button
                                 onClick={copyResultsLink}
-                                className="inline-flex items-center px-4 py-2 border border-[#e5e7eb] text-[#6b7280] rounded-xl hover:bg-[#f9fafb] transition-colors"
+                                className="inline-flex items-center px-3 md:px-4 py-1.5 md:py-2 border border-[#e5e7eb] text-[#6b7280] rounded-lg md:rounded-xl hover:bg-[#f9fafb] transition-colors text-xs md:text-sm"
                             >
                                 {copied ? (
                                     <>
-                                        <Check size={16} className="mr-2" />
+                                        <Check size={14} className="mr-1 md:mr-2" />
                                         Copied!
                                     </>
                                 ) : (
                                     <>
-                                        <Share2 size={16} className="mr-2" />
+                                        <Share2 size={14} className="mr-1 md:mr-2" />
                                         Share Results
                                     </>
                                 )}
                             </button>
                             <Link
                                 to={`/survey/${id}`}
-                                className="inline-flex items-center px-4 py-2 bg-[#4361ee] text-white rounded-xl hover:bg-[#3a56d4] transition-colors"
+                                className="inline-flex items-center px-3 md:px-4 py-1.5 md:py-2 bg-[#4361ee] text-white rounded-lg md:rounded-xl hover:bg-[#3a56d4] transition-colors text-xs md:text-sm"
                             >
-                                <BarChart3 size={16} className="mr-2" />
+                                <BarChart3 size={14} className="mr-1 md:mr-2" />
                                 View Survey
                             </Link>
                         </div>
                     </div>
 
                     {/* Stats Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                        <div className="bg-white p-6 rounded-2xl border border-[#e5e7eb] shadow-sm">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-6 md:mb-8">
+                        <div className="bg-white p-3 md:p-4 lg:p-6 rounded-xl md:rounded-2xl border border-[#e5e7eb] shadow-sm">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-[#6b7280] text-sm font-medium mb-1">Total Responses</p>
-                                    <p className="text-3xl font-bold text-[#1f2937]">{responses.length}</p>
+                                    <p className="text-xs md:text-sm text-[#6b7280] font-medium mb-1">Total Responses</p>
+                                    <p className="text-xl md:text-2xl lg:text-3xl font-bold text-[#1f2937]">{responses.length}</p>
                                 </div>
-                                <div className="w-12 h-12 rounded-xl bg-[#edf2ff] flex items-center justify-center">
-                                    <Users className="text-[#4361ee]" size={24} />
+                                <div className="w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 rounded-lg md:rounded-xl bg-[#edf2ff] flex items-center justify-center">
+                                    <Users className="text-[#4361ee]" size={16} />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-white p-6 rounded-2xl border border-[#e5e7eb] shadow-sm">
+                        <div className="bg-white p-3 md:p-4 lg:p-6 rounded-xl md:rounded-2xl border border-[#e5e7eb] shadow-sm">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-[#6b7280] text-sm font-medium mb-1">Questions</p>
-                                    <p className="text-3xl font-bold text-[#1f2937]">{survey.questions.length}</p>
+                                    <p className="text-xs md:text-sm text-[#6b7280] font-medium mb-1">Questions</p>
+                                    <p className="text-xl md:text-2xl lg:text-3xl font-bold text-[#1f2937]">{survey.questions.length}</p>
                                 </div>
-                                <div className="w-12 h-12 rounded-xl bg-[#edf2ff] flex items-center justify-center">
-                                    <MessageSquare className="text-[#4361ee]" size={24} />
+                                <div className="w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 rounded-lg md:rounded-xl bg-[#edf2ff] flex items-center justify-center">
+                                    <MessageSquare className="text-[#4361ee]" size={16} />
                                 </div>
                             </div>
                         </div>
@@ -366,42 +353,42 @@ const SurveyResults = () => {
                     </div>
 
                     {/* Tabs - Overview Tag Only */}
-                    <div className="flex border-b border-[#e5e7eb] mb-6">
-                        <div className="px-6 py-3 font-medium text-sm border-b-2 border-[#4361ee] text-[#4361ee]">
-                            <BarChart3 size={16} className="inline mr-2" />
+                    <div className="flex border-b border-[#e5e7eb] mb-4 md:mb-6 overflow-x-auto">
+                        <div className="px-4 py-2 md:px-6 md:py-3 font-medium text-xs md:text-sm border-b-2 border-[#4361ee] text-[#4361ee] whitespace-nowrap">
+                            <BarChart3 size={14} className="inline mr-1 md:mr-2" />
                             Overview
                         </div>
                     </div>
                 </div>
 
                 {/* Results Content */}
-                <div className="space-y-8">
+                <div className="space-y-4 md:space-y-6 lg:space-y-8">
                     {survey.questions.map((q, index) => (
-                        <div key={q._id} className="bg-white rounded-2xl border border-[#e5e7eb] shadow-sm overflow-hidden">
-                            <div className="p-6 border-b border-[#e5e7eb]">
+                        <div key={q._id} className="bg-white rounded-xl md:rounded-2xl border border-[#e5e7eb] shadow-sm overflow-hidden">
+                            <div className="p-4 md:p-6 border-b border-[#e5e7eb]">
                                 <div className="flex items-start justify-between">
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <div className="w-8 h-8 rounded-lg bg-[#edf2ff] flex items-center justify-center">
-                                                <span className="text-[#4361ee] font-bold">{index + 1}</span>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
+                                            <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-[#edf2ff] flex items-center justify-center shrink-0">
+                                                <span className="text-[#4361ee] font-bold text-sm">{index + 1}</span>
                                             </div>
-                                            <h3 className="text-lg font-semibold text-[#1f2937]">{q.text}</h3>
-                                            <span className="px-2 py-1 bg-[#f9fafb] text-[#6b7280] text-xs rounded-full">
+                                            <h3 className="text-sm md:text-base lg:text-lg font-semibold text-[#1f2937] truncate">{q.text}</h3>
+                                            <span className="px-1.5 md:px-2 py-0.5 md:py-1 bg-[#f9fafb] text-[#6b7280] text-xs rounded-full shrink-0">
                                                 {q.type === 'multiple-choice' ? 'Multiple Choice' : q.type === 'rating' ? 'Rating' : 'Short Answer'}
                                             </span>
                                         </div>
-                                        <p className="text-[#6b7280] text-sm">
+                                        <p className="text-xs md:text-sm text-[#6b7280]">
                                             {responses.length} response{responses.length !== 1 ? 's' : ''}
                                         </p>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="p-6">
+                            <div className="p-4 md:p-6">
                                 {q.type === 'multiple-choice' || q.type === 'rating' ? (
-                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 lg:gap-8">
                                         {/* Bar Chart */}
-                                        <div className="h-72">
+                                        <div className="h-48 md:h-56 lg:h-72">
                                             <Bar 
                                                 data={getChartData(q, 'bar')}
                                                 options={{
@@ -424,7 +411,10 @@ const SurveyResults = () => {
                                                                 color: '#e5e7eb'
                                                             },
                                                             ticks: {
-                                                                color: '#6b7280'
+                                                                color: '#6b7280',
+                                                                font: {
+                                                                    size: window.innerWidth < 768 ? 10 : 12
+                                                                }
                                                             }
                                                         },
                                                         x: {
@@ -432,7 +422,12 @@ const SurveyResults = () => {
                                                                 display: false
                                                             },
                                                             ticks: {
-                                                                color: '#6b7280'
+                                                                color: '#6b7280',
+                                                                font: {
+                                                                    size: window.innerWidth < 768 ? 10 : 12
+                                                                },
+                                                                maxRotation: 45,
+                                                                minRotation: 45
                                                             }
                                                         }
                                                     }
@@ -441,7 +436,7 @@ const SurveyResults = () => {
                                         </div>
 
                                         {/* Doughnut Chart */}
-                                        <div className="h-72">
+                                        <div className="h-48 md:h-56 lg:h-72">
                                             <Doughnut 
                                                 data={getChartData(q, 'doughnut')}
                                                 options={{
@@ -449,11 +444,14 @@ const SurveyResults = () => {
                                                     responsive: true,
                                                     plugins: {
                                                         legend: {
-                                                            position: 'right',
+                                                            position: window.innerWidth < 768 ? 'bottom' : 'right',
                                                             labels: {
                                                                 color: '#6b7280',
-                                                                padding: 20,
-                                                                usePointStyle: true
+                                                                padding: 10,
+                                                                usePointStyle: true,
+                                                                font: {
+                                                                    size: window.innerWidth < 768 ? 10 : 12
+                                                                }
                                                             }
                                                         },
                                                         tooltip: {
@@ -468,14 +466,14 @@ const SurveyResults = () => {
 
                                         {/* Stats Table */}
                                         <div className="lg:col-span-2">
-                                            <div className="overflow-x-auto">
-                                                <table className="w-full">
+                                            <div className="overflow-x-auto pl-5 md:pl-0 -mx-4 md:mx-0">
+                                                <table className="w-full min-w-[500px] md:min-w-full">
                                                     <thead>
                                                         <tr className="border-b border-[#e5e7eb]">
-                                                            <th className="text-left py-3 text-sm font-medium text-[#6b7280]">Option</th>
-                                                            <th className="text-left py-3 text-sm font-medium text-[#6b7280]">Responses</th>
-                                                            <th className="text-left py-3 text-sm font-medium text-[#6b7280]">Percentage</th>
-                                                            <th className="text-left py-3 text-sm font-medium text-[#6b7280]">Chart</th>
+                                                            <th className="text-left py-2 md:py-3 text-xs md:text-sm font-medium text-[#6b7280]">Option</th>
+                                                            <th className="text-left py-2 md:py-3 text-xs md:text-sm font-medium text-[#6b7280]">Responses</th>
+                                                            <th className="text-left py-2 md:py-3 text-xs md:text-sm font-medium text-[#6b7280]">Percentage</th>
+                                                            <th className="text-left py-2 md:py-3 text-xs md:text-sm font-medium text-[#6b7280]">Chart</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody className="divide-y divide-[#e5e7eb]">
@@ -485,12 +483,12 @@ const SurveyResults = () => {
                                                             
                                                             return (
                                                                 <tr key={idx} className="hover:bg-[#f9fafb]">
-                                                                    <td className="py-3 text-[#1f2937]">{label}</td>
-                                                                    <td className="py-3 font-medium text-[#1f2937]">{count}</td>
-                                                                    <td className="py-3">
-                                                                        <div className="flex items-center gap-3">
-                                                                            <span className="font-medium text-[#1f2937]">{percentage}%</span>
-                                                                            <div className="flex-1 h-2 bg-[#e5e7eb] rounded-full overflow-hidden">
+                                                                    <td className="py-2 md:py-3 text-xs md:text-sm text-[#1f2937] truncate max-w-[150px]">{label}</td>
+                                                                    <td className="py-2 md:py-3 font-medium text-xs md:text-sm text-[#1f2937]">{count}</td>
+                                                                    <td className="py-2 md:py-3">
+                                                                        <div className="flex items-center gap-2 md:gap-3">
+                                                                            <span className="font-medium text-xs md:text-sm text-[#1f2937]">{percentage}%</span>
+                                                                            <div className="flex-1 h-1.5 md:h-2 bg-[#e5e7eb] rounded-full overflow-hidden">
                                                                                 <div 
                                                                                     className="h-full bg-[#4361ee] rounded-full"
                                                                                     style={{ width: `${percentage}%` }}
@@ -498,8 +496,8 @@ const SurveyResults = () => {
                                                                             </div>
                                                                         </div>
                                                                     </td>
-                                                                    <td className="py-3">
-                                                                        <div className="w-4 h-4 rounded-full" style={{ backgroundColor: getChartData(q, 'doughnut')?.datasets[0].backgroundColor[idx] }}></div>
+                                                                    <td className="py-2 md:py-3">
+                                                                        <div className="w-3 h-3 md:w-4 md:h-4 rounded-full" style={{ backgroundColor: getChartData(q, 'doughnut')?.datasets[0].backgroundColor[idx] }}></div>
                                                                     </td>
                                                                 </tr>
                                                             );
@@ -510,34 +508,34 @@ const SurveyResults = () => {
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="space-y-4">
-                                        <div className="flex items-center justify-between mb-4">
-                                            <h4 className="font-medium text-[#1f2937]">Text Responses</h4>
-                                            <span className="text-sm text-[#6b7280]">
+                                    <div className="space-y-3 md:space-y-4">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2 md:mb-4">
+                                            <h4 className="font-medium text-sm md:text-base text-[#1f2937]">Text Responses</h4>
+                                            <span className="text-xs md:text-sm text-[#6b7280]">
                                                 Showing {getShortAnswers(q._id).length} response{getShortAnswers(q._id).length !== 1 ? 's' : ''}
                                             </span>
                                         </div>
                                         
-                                        <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
+                                        <div className="space-y-3 md:space-y-4 max-h-64 md:max-h-96 overflow-y-auto pr-1 md:pr-2">
                                             {getShortAnswers(q._id).length > 0 ? (
                                                 getShortAnswers(q._id).map((answer, idx) => (
-                                                    <div key={idx} className="p-4 bg-[#f9fafb] rounded-xl border border-[#e5e7eb]">
-                                                        <div className="flex justify-between items-start mb-2">
-                                                            <span className="text-sm font-medium text-[#4361ee]">
+                                                    <div key={idx} className="p-3 md:p-4 bg-[#f9fafb] rounded-lg md:rounded-xl border border-[#e5e7eb]">
+                                                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 md:gap-2 mb-1 md:mb-2">
+                                                            <span className="text-xs md:text-sm font-medium text-[#4361ee]">
                                                                 Response #{idx + 1}
                                                             </span>
                                                             <span className="text-xs text-[#6b7280]">
-                                                                <Calendar size={12} className="inline mr-1" />
+                                                                <Calendar size={10} className="inline mr-1" />
                                                                 {formatDate(answer.date)}
                                                             </span>
                                                         </div>
-                                                        <p className="text-[#1f2937]">{answer.text}</p>
+                                                        <p className="text-xs md:text-sm text-[#1f2937] wrap-break-words">{answer.text}</p>
                                                     </div>
                                                 ))
                                             ) : (
-                                                <div className="text-center py-8 text-[#6b7280]">
-                                                    <MessageSquare size={32} className="mx-auto mb-3 opacity-50" />
-                                                    <p>No text responses yet for this question.</p>
+                                                <div className="text-center py-6 md:py-8 text-[#6b7280]">
+                                                    <MessageSquare size={24} className="mx-auto mb-2 md:mb-3 opacity-50" />
+                                                    <p className="text-sm">No text responses yet for this question.</p>
                                                 </div>
                                             )}
                                         </div>
@@ -549,18 +547,18 @@ const SurveyResults = () => {
                 </div>
 
                 {/* Export Options */}
-                <div className="mt-8 p-6 bg-linear-to-r from-[#edf2ff] to-[#e0e7ff] rounded-2xl">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="mt-6 md:mt-8 p-4 md:p-6 bg-linear-to-r from-[#edf2ff] to-[#e0e7ff] rounded-xl md:rounded-2xl">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4">
                         <div>
-                            <h3 className="font-semibold text-[#1f2937] mb-1">Export Results</h3>
-                            <p className="text-sm text-[#6b7280]">Download your survey data for further analysis</p>
+                            <h3 className="font-semibold text-sm md:text-base text-[#1f2937] mb-1">Export Results</h3>
+                            <p className="text-xs md:text-sm text-[#6b7280]">Download your survey data for further analysis</p>
                         </div>
-                        <div className="flex flex-wrap gap-3">
+                        <div className="flex flex-wrap gap-2 md:gap-3 mt-2 md:mt-0">
                             <button 
                                 onClick={handleExportCSV}
-                                className="inline-flex items-center px-4 py-2 bg-white border border-[#e5e7eb] text-[#1f2937] rounded-xl hover:bg-[#f9fafb] transition-colors"
+                                className="inline-flex items-center px-3 md:px-4 py-1.5 md:py-2 bg-white border border-[#e5e7eb] text-[#1f2937] rounded-lg md:rounded-xl hover:bg-[#f9fafb] transition-colors text-xs md:text-sm"
                             >
-                                <Download size={16} className="mr-2" />
+                                <Download size={14} className="mr-1 md:mr-2" />
                                 CSV Export
                             </button>
                             
@@ -568,14 +566,17 @@ const SurveyResults = () => {
                             {user && survey.user && (typeof survey.user === 'object' ? survey.user._id : survey.user) === user._id && (
                                 <button 
                                     onClick={togglePublicAccess}
-                                    className={`inline-flex items-center px-4 py-2 border rounded-xl transition-colors ${
-                                        survey.isPublicResults 
-                                            ? 'bg-green-50 border-green-200 text-green-700 hover:bg-green-100' 
-                                            : 'bg-white border-[#e5e7eb] text-[#1f2937] hover:bg-[#f9fafb]'
-                                    }`}
+                                    className={`inline-flex items-center px-3 md:px-4 py-1.5 md:py-2 border rounded-lg md:rounded-xl transition-colors text-xs md:text-sm ${survey.isPublicResults 
+                                        ? 'bg-green-50 border-green-200 text-green-700 hover:bg-green-100' 
+                                        : 'bg-white border-[#e5e7eb] text-[#1f2937] hover:bg-[#f9fafb]'}`}
                                 >
-                                    <Share2 size={16} className="mr-2" />
-                                    {survey.isPublicResults ? 'Disable Public Access' : 'Enable Public Access'}
+                                    <Share2 size={14} className="mr-1 md:mr-2" />
+                                    <span className="hidden xs:inline">
+                                        {survey.isPublicResults ? 'Disable Public Access' : 'Enable Public Access'}
+                                    </span>
+                                    <span className="xs:hidden">
+                                        {survey.isPublicResults ? 'Disable Public' : 'Enable Public'}
+                                    </span>
                                 </button>
                             )}
                         </div>
